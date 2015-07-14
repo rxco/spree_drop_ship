@@ -6,4 +6,7 @@ Spree::Core::Engine.add_routes do
     resources :suppliers
   end
 
+  resources :suppliers, :path => 'shop'
+
+  resources :products
 end
