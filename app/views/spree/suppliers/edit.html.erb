@@ -1,1 +1,9 @@
 shop edit form
+<%= form_for @supplier do |f| %>
+    <%= render "form", form: f %>
+    <div data-hook="supplier_right_column_wrapper" class="col-md-4"></div>
+    <%# render 'update' and 'cancel'  buttons %>
+    <div class="col-md-8">
+        <%= render :partial => 'spree/shared/edit_resource_links' %>
+    </div>
+<% end %>

@@ -17,7 +17,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def edit
-    # TODO
+
   end
 
   private
