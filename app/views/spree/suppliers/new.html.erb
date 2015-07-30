@@ -1,1 +1,8 @@
-create a new shop
+<h1><%= Spree.t('new_shop') %></h1>
+
+<%= form_for @supplier do |f| %>
+    <%= render "form", form: f %>
+    <div class="col-md-8">
+        <%= render :partial => 'spree/shared/new_resource_links' %>
+    </div>
+<% end %>

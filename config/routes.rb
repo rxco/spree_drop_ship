@@ -7,6 +7,5 @@ Spree::Core::Engine.add_routes do
   end
 
   resources :suppliers, :path => 'shop'
-
   resources :products
 end

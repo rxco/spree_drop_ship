@@ -12,14 +12,18 @@ Spree::ProductsController.class_eval do
     params[:product][:shipping_category_id] = 1
     @product = Spree::Product.new product_params
     if @product.save
-      redirect_to action: "show", id: @product.slug
+      redirect_to @product
     else
       render 'new'
     end
   end
 
-  def edit
-    # TODO
+  def update
+    if @product.update_attributes supplier_params
+      redirect_to @product
+    else
+      render 'edit'
+    end
   end
 
   private
@@ -34,7 +38,7 @@ Spree::ProductsController.class_eval do
   def is_owner
     unless try_spree_current_user && (spree_current_user.admin? || spree_current_user.supplier_id == @product.supplier_id)
       flash[:error] = "You don't hav permission to access this content!"
-      redirect_to action: "show", id: @product.slug
+      redirect_to @product
     end
   end
 

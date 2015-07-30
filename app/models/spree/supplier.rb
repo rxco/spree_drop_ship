@@ -4,6 +4,14 @@ class Spree::Supplier < Spree::Base
 
   attr_accessor :password, :password_confirmation
 
+  has_attached_file :banner,
+                    :styles => { :large => "770x230#", :small => "320x90#" },
+                    :default_url => "/:class/banner/default.jpg",
+                    :url => "/:class/:id/banner/:style.jpg",
+                    :convert_options => {:all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"}
+
+  validates_attachment_content_type :banner, :content_type => /\Aimage/
+
   #==========================================
   # Associations
 

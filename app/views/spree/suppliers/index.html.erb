@@ -1,1 +1,4 @@
-list all shops
+<h1>All Shops</h1>
+<%- @suppliers.each do |supplier| %>
+    <%= image_tag supplier.banner.url(:small), class: "banner-image" %>
+<% end %>
