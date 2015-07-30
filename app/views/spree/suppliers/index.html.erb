@@ -1,4 +1,12 @@
-<h1>All Shops</h1>
+<h1>All Suppliers</h1>
 <%- @suppliers.each do |supplier| %>
-    <%= image_tag supplier.banner.url(:small), class: "banner-image" %>
+    <% if supplier.banner? %>
+        <%= link_to(supplier_path(supplier.slug)) do %>
+        <%= image_tag supplier.banner.url(:small), class: "banner-image", alt: supplier.name %>
+        <% end %>
+    <% end %>
+    <h2>
+        <%= link_to supplier.name, supplier_path(supplier) %>
+    </h2>
+    <hr/>
 <% end %>

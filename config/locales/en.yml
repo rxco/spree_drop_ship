@@ -4,12 +4,12 @@ en:
       spree/supplier:
         commission_flat_rate: Commission Flat Rate
         commission_percentage: Commission Percentage
-        name: Shop Name
-        description: Shop Description
+        name: Supplier Name
+        description: Supplier Description
         tax_id: TAX ID
         url: URL
-        slug: Shop URL
-        banner: Store Banner
+        slug: Supplier URL
+        banner: Supplier Banner
     errors:
       models:
         spree/supplier:
@@ -90,7 +90,3 @@ en:
         success: Thank you for signing up!
     supplier_signup: Supplier Sign Up
     suppliers: Suppliers
-    shop: Shop
-    shops: Shops
-    new_shop: New Shop
-    editing_shop: Editing Shop

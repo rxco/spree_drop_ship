@@ -1,2 +1,4 @@
-<%= debug(@supplier) %>
-<%= debug(@products) %>
+<% if @supplier.banner? %>
+<%= image_tag @supplier.banner.url(:large), class: "banner-image", alt: @supplier.name %>
+<% end %>
+<h2><%= @supplier.name %></h2>
