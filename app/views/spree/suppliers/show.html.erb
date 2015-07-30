@@ -2,3 +2,6 @@
 <%= image_tag @supplier.banner.url(:large), class: "banner-image", alt: @supplier.name %>
 <% end %>
 <h2><%= @supplier.name %></h2>
+<% if spree_current_user.supplier_id === @supplier.id %>
+    <%= link_to 'Edit', edit_supplier_path(@supplier) %>
+<% end %>
