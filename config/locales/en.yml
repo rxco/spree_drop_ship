@@ -75,6 +75,8 @@ en:
     supplier_details: Supplier Details
     supplier_info: Supplier Info
     supplier_information: Supplier Information
+    supplier_verify: Get Verified
+    supplier_identity: Verify Your Identity Now
     supplier_mailer:
       welcome:
         hello: "Hello %{name},"

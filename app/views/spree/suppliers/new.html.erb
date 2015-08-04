@@ -1,5 +1,7 @@
 <h1><%= Spree.t('new_supplier') %></h1>
 
+<%= render 'spree/shared/error_messages', target: @supplier %>
+
 <%= form_for @supplier do |f| %>
     <%= render "form", form: f %>
     <div class="col-md-8">

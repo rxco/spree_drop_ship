@@ -1,13 +1,14 @@
 class Spree::Supplier < Spree::Base
   extend FriendlyId
   friendly_id :name, use: :slugged
-
   attr_accessor :password, :password_confirmation
 
   has_attached_file :banner,
-                    :styles => { :large => "770x230#", :small => "320x90#" },
-                    :default_url => "/:class/banner/default.jpg",
-                    :url => "/:class/:id/banner/:style.jpg",
+                    :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
+                    :default_style => :large,
+                    :hash_secret => 'ndvq742rgbdas',
+                    :default_url => "/img/mkt/missing/:attachment/default.jpg",
+                    :url => "/img/mkt/suppliers/:id/:attachment/:hash/:style.:extension",
                     :convert_options => {:all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"}
 
   validates_attachment_content_type :banner, :content_type => /\Aimage/

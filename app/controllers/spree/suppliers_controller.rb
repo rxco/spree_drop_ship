@@ -1,8 +1,7 @@
 class Spree::SuppliersController < Spree::StoreController
 
   before_filter :is_new_supplier, only: [:new]
-  before_filter :get_supplier, only: [:edit, :update, :show]
-  before_filter :is_supplier, only: [:edit]
+  before_filter :supplier, only: [:edit, :update, :show]
 
   def index
     @suppliers = Spree::Supplier.all
@@ -19,6 +18,7 @@ class Spree::SuppliersController < Spree::StoreController
       flash[:success] = "Your store has been Created! Add a product"
       redirect_to new_product_path
     else
+      logger.debug @supplier.errors.messages.inspect
       render 'new'
     end
   end
@@ -38,16 +38,14 @@ class Spree::SuppliersController < Spree::StoreController
     end
   end
 
-  private
-
   def is_new_supplier
-    unless try_spree_current_user && !spree_current_user.supplier_id?
+    unless try_spree_current_user && !spree_current_user.supplier?
       flash[:error] = "You don't hav permission to access this content!"
       redirect_to action: "index"
     end
   end
 
-  def get_supplier
+  def supplier
     @supplier = Spree::Supplier.friendly.find(params[:id])
   end
 
