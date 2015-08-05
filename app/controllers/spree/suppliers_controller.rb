@@ -1,7 +1,8 @@
 class Spree::SuppliersController < Spree::StoreController
-
+  before_filter :check_authorization, only: [:edit, :update, :new, :verify]
   before_filter :is_new_supplier, only: [:new]
-  before_filter :supplier, only: [:edit, :update, :show]
+  before_filter :supplier, only: [:edit, :update, :show, :verify]
+  before_filter :is_supplier, only: [:edit, :update, :verify]
 
   def index
     @suppliers = Spree::Supplier.all
@@ -38,10 +39,19 @@ class Spree::SuppliersController < Spree::StoreController
     end
   end
 
+  private
+
+  def check_authorization
+    action = params[:action].to_sym
+    resource = Spree::Supplier
+
+    authorize! action, resource, session[:access_token]
+  end
+
   def is_new_supplier
-    unless try_spree_current_user && !spree_current_user.supplier?
-      flash[:error] = "You don't hav permission to access this content!"
-      redirect_to action: "index"
+    unless !spree_current_user.supplier?
+      flash[:error] = "You already have a shop setup!"
+      redirect_to spree_current_user.supplier
     end
   end
 
@@ -50,7 +60,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def is_supplier
-    unless try_spree_current_user && (spree_current_user.admin? || spree_current_user.supplier_id == @supplier.id)
+    unless try_spree_current_user && (spree_current_user.supplier_id === @supplier.id)
       flash[:error] = "You don't hav permission to access this content!"
       redirect_to @supplier
     end
