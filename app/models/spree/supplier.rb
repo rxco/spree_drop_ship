@@ -1,7 +1,10 @@
 class Spree::Supplier < Spree::Base
+  SLUG_FORMAT = /([[:lower:]]|[0-9]+-?[[:lower:]])(-[[:lower:]0-9]+|[[:lower:]0-9])*/
+
   extend FriendlyId
   friendly_id :name, use: :slugged
   attr_accessor :password, :password_confirmation
+
 
   has_attached_file :banner,
                     :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
@@ -38,6 +41,8 @@ class Spree::Supplier < Spree::Base
   validates :email,                  presence: true, email: true, uniqueness: true
   validates :name,                   presence: true, uniqueness: true
   validates :url,                    format: { with: URI::regexp(%w(http https)), allow_blank: true }
+  validates :slug,                   presence: true, uniqueness: true,
+      format: {with: Regexp.new('\A' + SLUG_FORMAT.source + '\z')}
 
   #==========================================
   # Callbacks

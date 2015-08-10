@@ -1,5 +1,5 @@
 Spree::ProductsController.class_eval do
-  before_filter :is_supplier, only: [:new, :create, :edit]
+  before_filter :check_authorization, only: [:edit, :update, :new]
   before_filter :get_product, only: [:edit]
   before_filter :is_owner, only: [:edit]
 
@@ -8,8 +8,12 @@ Spree::ProductsController.class_eval do
   end
 
   def create
+    uuid = Digest::MD5.hexdigest(Time.now.to_s).gsub(/[^0-9]/i, '').truncate(10)
     params[:product][:supplier_id] = spree_current_user.supplier_id
+    params[:product][:sku] = 'S' + spree_current_user.supplier_id.to_s + '-P' + uuid
     params[:product][:shipping_category_id] = 1
+    params[:product][:available_on] = Time.now.to_formatted_s(:db)
+
     @product = Spree::Product.new product_params
     if @product.save
       redirect_to @product
@@ -28,15 +32,15 @@ Spree::ProductsController.class_eval do
 
   private
 
-  def is_supplier
-    unless try_spree_current_user && spree_current_user.supplier_id?
-      flash[:error] = "You don't hav permission to access this content!"
-      redirect_to action: "index"
-    end
+  def check_authorization
+    action = params[:action].to_sym
+    resource = Spree::Product
+
+    authorize! action, resource, session[:access_token]
   end
 
   def is_owner
-    unless try_spree_current_user && (spree_current_user.admin? || spree_current_user.supplier_id == @product.supplier_id)
+    unless spree_current_user.supplier_id === @product.supplier_id
       flash[:error] = "You don't hav permission to access this content!"
       redirect_to @product
     end

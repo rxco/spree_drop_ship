@@ -9,7 +9,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def new
-      @supplier = Spree::Supplier.new
+    @supplier = Spree::Supplier.new
   end
 
   def create
@@ -19,8 +19,7 @@ class Spree::SuppliersController < Spree::StoreController
       flash[:success] = "Your store has been Created! Add a product"
       redirect_to new_product_path
     else
-      logger.debug @supplier.errors.messages.inspect
-      render 'new'
+      render :action=>'new'
     end
   end
 
