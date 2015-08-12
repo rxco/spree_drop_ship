@@ -1,8 +1,8 @@
 class Spree::SuppliersController < Spree::StoreController
-  before_filter :check_authorization, only: [:edit, :update, :new, :verify]
+  before_filter :check_authorization, only: [:edit, :update, :new, :verify, :destroy]
   before_filter :is_new_supplier, only: [:new]
-  before_filter :supplier, only: [:edit, :update, :show, :verify]
-  before_filter :is_supplier, only: [:edit, :update, :verify]
+  before_filter :supplier, only: [:edit, :update, :show, :verify, :destroy]
+  before_filter :is_supplier, only: [:edit, :update, :verify, :destroy]
 
   def index
     @suppliers = Spree::Supplier.all
@@ -16,10 +16,10 @@ class Spree::SuppliersController < Spree::StoreController
     params[:supplier][:email] = spree_current_user.email
     @supplier = Spree::Supplier.new supplier_params
     if @supplier.save
-      flash[:success] = "Your store has been Created! Add a product"
-      redirect_to new_product_path
+      flash[:success] = "Your shop has been Created! Add a product"
+      render "verify"
     else
-      render :action=>'new'
+      render "new"
     end
   end
 
@@ -30,11 +30,18 @@ class Spree::SuppliersController < Spree::StoreController
 
   def update
     if @supplier.update_attributes supplier_params
-      flash[:success] = "Your store has been updated!"
+      flash[:success] = "Your shop has been updated!"
       redirect_to @supplier
     else
       logger.debug @supplier.errors.messages.inspect
       render "edit"
+    end
+  end
+
+  def destroy
+    if @supplier.destroy
+      flash[:success] = "Your shop has been deleted!"
+      render "index"
     end
   end
 

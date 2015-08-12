@@ -15,6 +15,18 @@ Spree::ProductsController.class_eval do
     params[:product][:available_on] = Time.now.to_formatted_s(:db)
 
     @product = Spree::Product.new product_params
+
+    if params[:image].any?
+      params[:image][:alt] = 'Some Alt text'
+      params[:image][:position] = 3
+      params[:image][:viewable_type] = 'Spree::Variant'
+      params[:image][:viewable_id] = 39
+      @image = Spree::Image.new image_params;
+
+      abort @image.save
+    end
+
+
     if @product.save
       redirect_to @product
     else
@@ -53,5 +65,9 @@ Spree::ProductsController.class_eval do
   def product_params
     permit = permitted_product_attributes + [:supplier_id]
     params.require(:product).permit(permit)
+  end
+
+  def image_params
+    params.require(:image).permit(Spree::PermittedAttributes.image_attributes)
   end
 end
