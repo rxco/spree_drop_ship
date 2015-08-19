@@ -6,26 +6,35 @@ class Spree::SuppliersController < Spree::StoreController
 
   def index
     @suppliers = Spree::Supplier.all
+    @title = "Pet Shops"
+    @body_id = 'shops'
   end
 
   def new
     @supplier = Spree::Supplier.new
+    @title = "New Shop"
+    @body_id = 'shop-manage'
   end
 
   def create
     params[:supplier][:email] = spree_current_user.email
     @supplier = Spree::Supplier.new supplier_params
     if @supplier.save
-      flash[:success] = "Your shop has been Created! Add a product"
-      render "verify"
+      flash[:success] = "Your shop has been created! Verify your account."
+      redirect_to verify_supplier_path(@supplier)
     else
       render "new"
     end
   end
 
   def show
-    @products = Spree::Product.find_by supplier_id: @supplier.id
+    @products = Spree::Product.where("supplier_id = ?", @supplier.id)
     @title = "Shop #{@supplier.name}"
+    @body_id = 'shop-details'
+  end
+
+  def edit
+    @body_id = 'shop-manage'
   end
 
   def update
@@ -41,7 +50,7 @@ class Spree::SuppliersController < Spree::StoreController
   def destroy
     if @supplier.destroy
       flash[:success] = "Your shop has been deleted!"
-      render "index"
+      redirect_to "/shop"
     end
   end
 

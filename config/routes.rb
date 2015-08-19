@@ -7,7 +7,11 @@ Spree::Core::Engine.add_routes do
   end
 
   get 'suppliers/connect', to: 'suppliers#connect'
-  get 'suppliers/:id/verify', to: 'suppliers#verify'
+  resources :suppliers do
+    member do
+      get 'verify'
+    end
+  end
   resources :suppliers
   resources :products
 end
