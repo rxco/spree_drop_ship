@@ -1,16 +1,20 @@
 Spree::ProductsController.class_eval do
   before_filter :check_authorization, only: [:edit, :update, :new, :delete]
-  before_filter :get_product, only: [:edit]
+  before_filter :product, only: [:edit, :update]
   before_filter :is_owner, only: [:edit, :delete]
-  before_filter :load_data, only: [:new, :edit]
+  before_filter :load_data, only: [:new, :edit, :create]
 
   def new
     @product = Spree::Product.new
     @title = "New Product"
     @body_id = 'product-manage'
+    @selected = 'product'
   end
 
   def create
+    @title = "New Product"
+    @body_id = 'product-manage'
+
     uuid = Digest::SHA1.hexdigest([Time.now, rand].join)[0, 10].gsub(/\D/, '')
     params[:product][:sku] = 'S' + spree_current_user.supplier_id.to_s + '-P' + uuid
     params[:product][:supplier_id] = spree_current_user.supplier_id
@@ -18,18 +22,26 @@ Spree::ProductsController.class_eval do
     params[:product][:available_on] = Time.now.to_formatted_s(:db)
 
     @product = Spree::Product.new product_params
+
     if @product.save
       variant = Spree::Variant.find_by_sku(params[:product][:sku])
 
+      # Add Initial Stock
+      stock = Spree::StockItem.find_by_variant_id(variant.id)
+      stock.set_count_on_hand(params[:product][:total_on_hand].to_i)
+
+      # Taxonomy
       if params[:product][:taxon_ids].present?
-        # params[:product][:taxon_ids] = params[:product][:taxon_ids].split(',')
-        taxonomy = Spree::Taxonomy.find_by_id(params[:product][:taxon_ids])
-        taxon = Spree::Taxon.where("parent_id is NULL and taxonomy_id = ?", taxonomy.id)
-        if !taxon.nil? and !@product.taxons.include?(taxon)
-          @product.taxons << taxon
+        taxon_ids = params[:product][:taxon_ids] = params[:product][:taxon_ids].split(',')
+        taxon_ids.each do |id|
+          taxon = Spree::Taxon.find_by_id(id)
+          if !taxon.nil? and !@product.taxons.include?(taxon)
+            @product.taxons << taxon
+          end
         end
       end
 
+      # Images
       if params[:images].present?
         params[:images].each do |key, image|
           logger.debug key.inspect
@@ -47,7 +59,7 @@ Spree::ProductsController.class_eval do
         end
       end
 
-
+      # Option Types
       # if params[:product][:option_type_ids].present?
       #   option_types = []
       #   params[:product][:option_type_ids].each do |id|
@@ -58,7 +70,8 @@ Spree::ProductsController.class_eval do
       #   end
       #   @product.option_types = option_types
       # end
-      #
+
+      # Variants
       # if params[:variants].present?
       #   # TODO improving variant creation
       #   # params[:variants].each do |key, values|
@@ -82,7 +95,7 @@ Spree::ProductsController.class_eval do
   end
 
   def update
-    if @product.update_attributes supplier_params
+    if @product.update_attributes product_params
       redirect_to @product
     else
       render 'edit'
@@ -105,7 +118,7 @@ Spree::ProductsController.class_eval do
     end
   end
 
-  def get_product
+  def product
     @product = Spree::Product.friendly.find(params[:id])
   end
 

@@ -14,6 +14,7 @@ class Spree::SuppliersController < Spree::StoreController
     @supplier = Spree::Supplier.new
     @title = "New Shop"
     @body_id = 'shop-manage'
+    @selected = 'new'
   end
 
   def create
