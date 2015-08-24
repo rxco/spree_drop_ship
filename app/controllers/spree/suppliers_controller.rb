@@ -58,14 +58,17 @@ class Spree::SuppliersController < Spree::StoreController
   private
 
   def check_authorization
+    if try_spree_current_user.nil?
+      redirect_unauthorized_access
+    end
+
     action = params[:action].to_sym
     resource = Spree::Supplier
-
     authorize! action, resource, session[:access_token]
   end
 
   def is_new_supplier
-    unless try_spree_current_user && !spree_current_user.supplier?
+    unless !spree_current_user.supplier?
       flash[:error] = "You already have a shop setup!"
       redirect_to spree_current_user.supplier
     end
