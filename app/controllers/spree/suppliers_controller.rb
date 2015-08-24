@@ -65,7 +65,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def is_new_supplier
-    unless !spree_current_user.supplier?
+    unless try_spree_current_user && !spree_current_user.supplier?
       flash[:error] = "You already have a shop setup!"
       redirect_to spree_current_user.supplier
     end
