@@ -27,7 +27,7 @@ Spree::ProductsController.class_eval do
       variant = Spree::Variant.find_by_sku(params[:product][:sku])
       logger.debug variant.inspect
       # Add Initial Stock
-      stock = Spree::StockItem.find_by_variant_id(variant.id)
+      stock = Spree::StockItem.find_or_create_by(variant_id: variant.id)
       logger.debug stock.inspect
       stock.set_count_on_hand(params[:product][:total_on_hand].to_i)
       logger.debug stock.inspect
