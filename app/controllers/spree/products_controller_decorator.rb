@@ -27,7 +27,8 @@ Spree::ProductsController.class_eval do
       variant = Spree::Variant.find_by_sku(params[:product][:sku])
       logger.debug variant.inspect
       # Add Initial Stock
-      stock = Spree::StockItem.find_or_create_by(variant_id: variant.id)
+      location = Spree:StockLocation.find_by_supplier_id(@product.supplier_id)
+      stock = Spree::StockItem.create_with(stock_location_id: location.id).find_or_create_by(variant_id: variant.id)
       logger.debug stock.inspect
       stock.set_count_on_hand(params[:product][:total_on_hand].to_i)
       logger.debug stock.inspect
@@ -54,7 +55,7 @@ Spree::ProductsController.class_eval do
           params[:image][:viewable_type] = 'Spree::Variant'
           params[:image][:viewable_id] = variant.id
           logger.debug params[:image].inspect
-          attachment = Spree::Image.new image_params;
+          attachment = Spree::Image.new image_params
           attachment.save
           logger.debug attachment.inspect
         end
