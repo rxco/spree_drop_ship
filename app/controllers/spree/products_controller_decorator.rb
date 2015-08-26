@@ -8,7 +8,7 @@ Spree::ProductsController.class_eval do
     @product = Spree::Product.new
     @title = "New Product"
     @body_id = 'product-manage'
-    @selected = 'product'
+    @selected = 'product' if params[:onboard].present?
   end
 
   def create
