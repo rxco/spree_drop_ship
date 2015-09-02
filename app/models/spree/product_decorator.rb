@@ -18,6 +18,10 @@ Spree::Product.class_eval do
     suppliers.present?
   end
 
+  def supplier_name
+    Spree::Supplier.friendly.find(self.supplier_id).name
+  end
+
   # TODO Look for other way to add variants to product
   # Builds variants from a hash of option types & values
   def build_variants_from_option_values_hash(option_values_hash)

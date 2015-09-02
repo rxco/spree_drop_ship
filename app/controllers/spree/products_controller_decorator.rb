@@ -3,6 +3,7 @@ Spree::ProductsController.class_eval do
   before_filter :product, only: [:edit, :update]
   before_filter :is_owner, only: [:edit, :delete]
   before_filter :load_data, only: [:new, :edit, :create]
+  before_filter :load_supplier, only: [:show]
 
   def new
     @product = Spree::Product.new
@@ -147,5 +148,10 @@ Spree::ProductsController.class_eval do
 
     # @tax_categories = TaxCategory.order(:name)
     # @shipping_categories = ShippingCategory.order(:name)
+  end
+
+  def load_supplier
+    @supplier = Spree::Supplier.find_by(:id => @product.supplier_id)
+    @products = @supplier.products(@product.id)
   end
 end
