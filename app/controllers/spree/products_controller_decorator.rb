@@ -19,7 +19,6 @@ Spree::ProductsController.class_eval do
     uuid = Digest::SHA1.hexdigest([Time.now, rand].join)[0, 10].gsub(/\D/, '')
     params[:product][:sku] = 'S' + spree_current_user.supplier_id.to_s + '-P' + uuid
     params[:product][:supplier_id] = spree_current_user.supplier_id
-    params[:product][:shipping_category_id] = 1
     params[:product][:available_on] = Time.now.to_formatted_s(:db)
 
     @product = Spree::Product.new product_params
@@ -147,7 +146,7 @@ Spree::ProductsController.class_eval do
     @sub2 = Spree::Taxon.order(:name).where(:depth => 2)
 
     # @tax_categories = TaxCategory.order(:name)
-    # @shipping_categories = ShippingCategory.order(:name)
+    @shipping_categories = Spree::ShippingCategory.order(:id)
   end
 
   def load_supplier
