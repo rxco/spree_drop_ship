@@ -1,9 +1,9 @@
 Spree::ProductsController.class_eval do
-  before_filter :check_authorization, only: [:edit, :update, :new, :delete]
-  before_filter :product, only: [:edit, :update]
-  before_filter :is_owner, only: [:edit, :delete]
+  before_filter :check_authorization, only: [:edit, :update, :new, :destroy]
+  before_filter :product, only: [:edit, :update, :destroy]
+  before_filter :is_owner, only: [:edit, :destroy]
   before_filter :load_data, only: [:new, :edit, :create]
-  before_filter :load_supplier, only: [:show]
+  before_filter :load_supplier, only: [:show, :destroy]
 
   def new
     @product = Spree::Product.new
@@ -46,15 +46,13 @@ Spree::ProductsController.class_eval do
       # Images
       if params[:images].present?
         params[:images].each do |key, image|
-          logger.debug key.inspect
-          logger.debug image.inspect
           params[:image] = {}
           params[:image][:attachment] = image
           # params[:image][:alt] = 'Some Alt text'
           params[:image][:position] = key.to_i + 1
           params[:image][:viewable_type] = 'Spree::Variant'
           params[:image][:viewable_id] = variant.id
-          logger.debug params[:image].inspect
+          params[:image][:crop] = params[:crop]['image' + key]
           attachment = Spree::Image.new image_params
           attachment.save
           logger.debug attachment.inspect
@@ -104,6 +102,13 @@ Spree::ProductsController.class_eval do
     end
   end
 
+  def destroy
+    if @product.destroy
+      flash[:success] = "Your product has been deleted!"
+      redirect_to @supplier
+    end
+  end
+
   private
 
   def check_authorization
@@ -130,7 +135,8 @@ Spree::ProductsController.class_eval do
   end
 
   def image_params
-    params.require(:image).permit(Spree::PermittedAttributes.image_attributes)
+    permit = Spree::PermittedAttributes.image_attributes + [:crop]
+    params.require(:image).permit(permit)
   end
 
   def variant_params
