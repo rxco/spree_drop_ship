@@ -26,12 +26,15 @@ Spree::ProductsController.class_eval do
     if @product.save
       variant = Spree::Variant.find_by_sku(params[:product][:sku])
       logger.debug variant.inspect
+
       # Add Initial Stock
       location = Spree::StockLocation.find_by_supplier_id(@product.supplier_id)
-      stock = Spree::StockItem.create_with(stock_location_id: location.id).find_or_create_by(variant_id: variant.id)
+      logger.debug "LOCATION: #{location}"
+      stock = Spree::StockItem.where(:stock_location_id => location.id, :variant_id => variant.id).first_or_create
       logger.debug stock.inspect
       stock.set_count_on_hand(params[:product][:total_on_hand].to_i)
       logger.debug stock.inspect
+
       # Taxonomy
       if params[:product][:taxon_ids].present?
         taxon_ids = params[:product][:taxon_ids] = params[:product][:taxon_ids].split(',')
@@ -60,27 +63,20 @@ Spree::ProductsController.class_eval do
       end
 
       # Option Types
-      # if params[:product][:option_type_ids].present?
-      #   option_types = []
-      #   params[:product][:option_type_ids].each do |id|
-      #     option = Spree::OptionType.find_by_id(id)
-      #     if option.present?
-      #       option_types << option
-      #     end
-      #   end
-      #   @product.option_types = option_types
-      # end
+      if params[:product][:option_type_ids].present?
+        option_types = []
+        params[:product][:option_type_ids].split(',').each do |id|
+          option = Spree::OptionType.find_by_id(id)
+          if option.present?
+            option_types << option
+          end
+        end
+        @product.option_types = option_types
+      end
 
-      # Variants
+      # # Variants
       # if params[:variants].present?
-      #   # TODO improving variant creation
-      #   # params[:variants].each do |key, values|
-      #   #   variant = Spree::Variant.new(values)
-      #   #   abort variant.inspect
-      #   #   variant[:sku] = params[:product][:sku] + 'v-' + key
-      #   #   @product.variants = variant
-      #   # end
-      #   @product.build_variants_from_option_values_hash(params[:variants])
+      #   @product.build_variants_from_option_values_hash(params[:variants], params[:product][:sku])
       # end
 
       redirect_to @product

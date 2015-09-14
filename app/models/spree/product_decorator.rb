@@ -18,21 +18,28 @@ Spree::Product.class_eval do
     suppliers.present?
   end
 
+  def is_supplier?(user = nil)
+    user && user.supplier_id == self.supplier_id
+  end
+
   def supplier_name
     Spree::Supplier.friendly.find(self.supplier_id).name
   end
 
   # TODO Look for other way to add variants to product
   # Builds variants from a hash of option types & values
-  def build_variants_from_option_values_hash(option_values_hash)
+  def build_variants_from_option_values_hash(option_values_hash, sku)
     ensure_option_types_exist_for_values_hash
     values = option_values_hash.values
 
     # values = values.inject(values.shift) { |memo, value| memo.product(value).map(&:flatten) }
-    values.each do |value|
+    values.each_with_index  do |value, index|
       variant = variants.create(
           option_value_ids: value[:ids],
-          price: value[:price]
+          price: value[:price],
+          position: index + 1,
+          stock_items_count: value[:quantity],
+          sku: sku + '-' + index.to_s
       )
     end
     save
