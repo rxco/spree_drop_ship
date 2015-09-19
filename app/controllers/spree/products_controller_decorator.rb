@@ -50,14 +50,17 @@ Spree::ProductsController.class_eval do
       if params[:images].present?
         params[:images].each do |key, image|
           params[:image] = {}
-          params[:image][:attachment] = image
+          # params[:image][:attachment] = image
           # params[:image][:alt] = 'Some Alt text'
           params[:image][:position] = key.to_i + 1
           params[:image][:viewable_type] = 'Spree::Variant'
           params[:image][:viewable_id] = variant.id
           params[:image][:crop] = params[:crop]['image' + key]
           attachment = Spree::Image.new image_params
-          attachment.save
+          attachment.attachment_remote_url=(params[:key]['image' + key])
+          if attachment.save
+            attachment.attachment_delete(params[:key]['image' + key])
+          end
           logger.debug attachment.inspect
         end
       end
@@ -102,6 +105,33 @@ Spree::ProductsController.class_eval do
     if @product.destroy
       flash[:success] = "Your product has been deleted!"
       redirect_to @supplier
+    end
+  end
+
+  def image
+    file = params[:file]
+    errors = validate_file(file)
+    if errors.blank?
+      content_type = file.content_type
+      extension = Rack::Mime::MIME_TYPES.invert[content_type]
+      file_string = "uploads/#{SecureRandom.uuid}#{extension}"
+      presigned_post = S3_BUCKET.presigned_post(
+          key: file_string,
+          success_action_status: 201,
+          acl: :public_read,
+          content_type: content_type,
+          expires_header: 1.hour.from_now.httpdate
+      )
+      render :json => {
+        result: true,
+        url: presigned_post.url,
+        data: presigned_post.fields
+      }
+    else
+      render :json => {
+        result: false,
+        errors: errors
+      }
     end
   end
 
@@ -154,5 +184,17 @@ Spree::ProductsController.class_eval do
   def load_supplier
     @supplier = Spree::Supplier.find_by(:id => @product.supplier_id)
     @products = @supplier.products(@product.id)
+  end
+
+  def validate_file(file)
+    errors = []
+    if file.size > 5000001
+      errors << "5MB max file size allowed."
+    end
+    if !file.content_type.match(/\Aimage\/.*\Z/)
+      errors << "Only JPG, PNG and GIF files are allowed."
+    end
+
+    errors
   end
 end
