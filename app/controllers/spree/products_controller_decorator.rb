@@ -109,10 +109,9 @@ Spree::ProductsController.class_eval do
   end
 
   def image
-    file = params[:file]
-    errors = validate_file(file)
+    errors = validate_file(params)
     if errors.blank?
-      content_type = file.content_type
+      content_type = params['type']
       extension = Rack::Mime::MIME_TYPES.invert[content_type]
       file_string = "uploads/#{SecureRandom.uuid}#{extension}"
       presigned_post = S3_BUCKET.presigned_post(
@@ -186,12 +185,12 @@ Spree::ProductsController.class_eval do
     @products = @supplier.products(@product.id)
   end
 
-  def validate_file(file)
+  def validate_file(params)
     errors = []
-    if file.size > 5000001
+    if params['size'].to_i > 5000001
       errors << "5MB max file size allowed."
     end
-    if !file.content_type.match(/\Aimage\/.*\Z/)
+    if !params['type'].match(/\Aimage\/.*\Z/)
       errors << "Only JPG, PNG and GIF files are allowed."
     end
 
