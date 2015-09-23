@@ -61,7 +61,6 @@ Spree::ProductsController.class_eval do
           if attachment.save
             attachment.attachment_delete(params[:key]['image' + key])
           end
-          logger.debug attachment.inspect
         end
       end
 
@@ -77,7 +76,7 @@ Spree::ProductsController.class_eval do
         @product.option_types = option_types
       end
 
-      # # Variants
+      # Variants
       # if params[:variants].present?
       #   @product.build_variants_from_option_values_hash(params[:variants], params[:product][:sku])
       # end
