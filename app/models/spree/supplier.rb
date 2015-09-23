@@ -10,7 +10,7 @@ class Spree::Supplier < Spree::Base
       :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
       :default_style => :large,
       :hash_secret => 'ndvq742rgbdas',
-      :default_url => "/img/mkt/missing/:attachment/default.jpg",
+      :default_url => "noimage/:attachment-:style.png",
       :convert_options => {:all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"}
   }
 
