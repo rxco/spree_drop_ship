@@ -5,32 +5,23 @@ class Spree::Supplier < Spree::Base
   friendly_id :name, use: :slugged
   attr_accessor :password, :password_confirmation
 
-  default_options = {
-      :url => "/img/mkt/suppliers/:id/:attachment/:hash/:style.:extension",
-      :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
-      :default_style => :large,
-      :hash_secret => 'ndvq742rgbdas',
-      :default_url => "noimage/:attachment-:style.png",
-      :convert_options => {:all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"}
-  }
+  has_attached_file :banner, :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
+                    :default_style => :large,
+                    :default_url => "noimage/:attachment-:style.png",
+                    :convert_options => {
+                        :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
+                    },
+                    :s3_credentials => {
+                        :access_key_id => ENV["AWS_ACCESS_KEY_ID"],
+                        :secret_access_key => ENV["AWS_SECRET_ACCESS_KEY"]
+                    },
+                    :storage => :s3,
+                    :s3_headers => {"Cache-Control" => "max-age=31557600"},
+                    :s3_protocol => "https",
+                    :bucket => ENV["S3_BUCKET_NAME"],
+                    :url => ":s3_domain_url",
+                    :path => "/suppliers/:id/:attachment/:style.:extension"
 
-  if Rails.env.production?
-    s3_storage_options = {
-        s3_credentials: {
-        access_key_id: ENV["AWS_ACCESS_KEY_ID"],
-        secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"]
-        },
-        storage: :s3,
-        s3_headers: {"Cache-Control" => "max-age=31557600"},
-        s3_protocol: "https",
-        bucket: ENV["S3_BUCKET_NAME"],
-        url: ":s3_domain_url",
-        path: "/suppliers/:id/:attachment/:hash/:style.:extension"
-    }
-    default_options = default_options.merge(s3_storage_options)
-  end
-
-  has_attached_file :banner, default_options
   validates_attachment_content_type :banner, :content_type => /\Aimage/
 
   #==========================================

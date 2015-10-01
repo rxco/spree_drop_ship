@@ -6,6 +6,10 @@ Spree::Core::Engine.add_routes do
     resources :suppliers
   end
 
+  namespace :api, defaults: { format: 'json' } do
+    resource :sessions, controller: :user_sessions
+  end
+
   get 'suppliers/connect', to: 'suppliers#connect'
   resources :suppliers do
     member do

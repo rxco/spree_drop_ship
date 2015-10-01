@@ -29,7 +29,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def show
-    @products = Spree::Product.where("supplier_id = ?", @supplier.id)
+    @products = @supplier.products
     @title = "Shop #{@supplier.name}"
     @body_id = 'shop-details'
   end
