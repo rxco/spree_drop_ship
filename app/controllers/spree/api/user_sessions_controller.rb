@@ -18,8 +18,8 @@ module Spree
 
       def destroy
         sign_out @user
-        session = ActiveRecord::SessionStore::Session.find_by_session_id(params[:user][:session])
-        session.destroy
+        # session = ActiveRecord::SessionStore::Session.find_by_session_id(params[:user][:session])
+        # session.destroy
         respond_with('', :status => 204)
       end
 
