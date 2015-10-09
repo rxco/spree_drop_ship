@@ -11,12 +11,5 @@ Spree::Core::Engine.add_routes do
     resources :suppliers, only: [:index, :show]
   end
 
-  get 'suppliers/connect', to: 'suppliers#connect'
-  resources :suppliers do
-    member do
-      get 'verify'
-    end
-  end
-  resources :suppliers
   resources :products
 end
