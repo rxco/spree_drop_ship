@@ -49,7 +49,8 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def destroy
-    if @supplier.destroy
+    if @supplier.delete
+      @supplier.products.delete_all
       flash[:success] = "Your shop has been deleted!"
       redirect_to "/shop"
     end
