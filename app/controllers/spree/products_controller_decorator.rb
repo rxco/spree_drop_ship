@@ -48,20 +48,7 @@ Spree::ProductsController.class_eval do
 
       # Images
       if params[:images].present?
-        params[:images].each do |key, image|
-          params[:image] = {}
-          # params[:image][:attachment] = image
-          # params[:image][:alt] = 'Some Alt text'
-          params[:image][:position] = key.to_i + 1
-          params[:image][:viewable_type] = 'Spree::Variant'
-          params[:image][:viewable_id] = variant.id
-          params[:image][:crop] = params[:crop]['image' + key]
-          attachment = Spree::Image.new image_params
-          attachment.attachment_remote_url=(params[:key]['image' + key])
-          if attachment.save
-            attachment.attachment_delete(params[:key]['image' + key])
-          end
-        end
+        images(variant)
       end
 
       # Option Types
@@ -94,6 +81,32 @@ Spree::ProductsController.class_eval do
 
   def update
     if @product.update_attributes product_params
+      variant = Spree::Variant.find_by_sku(@product.sku)
+
+      # Taxonomy
+      if params[:product][:taxon_ids].present?
+        @product.taxons.delete_all
+        taxon_ids = params[:product][:taxon_ids] = params[:product][:taxon_ids].split(',')
+        taxon_ids.each do |id|
+          taxon = Spree::Taxon.find_by_id(id)
+          if !taxon.nil? and !@product.taxons.include?(taxon)
+            @product.taxons << taxon
+          end
+        end
+      end
+
+      if params[:remove_images].present?
+        params[:remove_images].split(',').each do |id|
+          Spree::Asset.find(id).delete
+        end
+      end
+
+      # Images
+      if params[:images].present?
+        images(variant)
+      end
+
+
       redirect_to @product
     else
       render 'edit'
@@ -194,5 +207,22 @@ Spree::ProductsController.class_eval do
     end
 
     errors
+  end
+
+  def images(variant)
+    params[:images].each do |key, image|
+      params[:image] = {}
+      # params[:image][:attachment] = image
+      # params[:image][:alt] = 'Some Alt text'
+      params[:image][:position] = key.to_i + 1
+      params[:image][:viewable_type] = 'Spree::Variant'
+      params[:image][:viewable_id] = variant.id
+      params[:image][:crop] = params[:crop]['image' + key]
+      attachment = Spree::Image.new image_params
+      attachment.attachment_remote_url=(params[:key]['image' + key])
+      if attachment.save
+        attachment.attachment_delete(params[:key]['image' + key])
+      end
+    end
   end
 end
