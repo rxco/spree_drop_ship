@@ -7,6 +7,11 @@ module Spree
           respond_with(@suppliers)
       end
 
+      def show
+        @supplier = Spree::Supplier.find(params[:id])
+        respond_with(@supplier)
+      end
+
     end
   end
 end
