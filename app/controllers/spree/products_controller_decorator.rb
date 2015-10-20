@@ -46,6 +46,9 @@ Spree::ProductsController.class_eval do
         end
       end
 
+      # Properties
+      @product.set_property('Processing', processing_time(params[:processing_time])) if params[:processing_time].present?
+
       # Images
       if params[:images].present?
         images(variant)
@@ -94,6 +97,9 @@ Spree::ProductsController.class_eval do
           end
         end
       end
+
+      # Properties
+      @product.set_property('Processing', processing_time(params[:processing_time])) if params[:processing_time].present?
 
       if params[:remove_images].present?
         params[:remove_images].split(',').each do |id|
@@ -224,5 +230,19 @@ Spree::ProductsController.class_eval do
         attachment.attachment_delete(params[:key]['image' + key])
       end
     end
+  end
+
+  def processing_time(key)
+    times = [
+        "1 Business Day",
+        "1-2 Business Days",
+        "1-3 Business Days",
+        "3-5 Business Days",
+        "1-2 Weeks",
+        "2-3 Weeks",
+        "3-4 Weeks",
+        "5-6 Weeks"
+    ]
+    times[key.to_i]
   end
 end
