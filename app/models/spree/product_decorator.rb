@@ -24,6 +24,10 @@ Spree::Product.class_eval do
 
   def supplier_name
     Spree::Supplier.friendly.find(self.supplier_id).name
+    end
+
+  def supplier
+    Spree::Supplier.friendly.find(self.supplier_id)
   end
 
   # TODO Look for other way to add variants to product
