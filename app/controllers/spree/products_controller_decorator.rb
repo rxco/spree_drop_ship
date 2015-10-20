@@ -20,6 +20,7 @@ Spree::ProductsController.class_eval do
     params[:product][:sku] = 'S' + spree_current_user.supplier_id.to_s + '-P' + uuid
     params[:product][:supplier_id] = spree_current_user.supplier_id
     params[:product][:available_on] = Time.now.to_formatted_s(:db)
+    params[:product][:shipping_category_id] = 10
 
     @product = Spree::Product.new product_params
 
