@@ -1,4 +1,5 @@
 class Spree::Admin::SuppliersController < Spree::Admin::ResourceController
+  after_filter :delete_products, only: [:destroy]
 
   def edit
     @object.address = Spree::Address.default unless @object.address.present?
@@ -27,6 +28,10 @@ class Spree::Admin::SuppliersController < Spree::Admin::ResourceController
 
     def location_after_save
       spree.edit_admin_supplier_path(@object)
+    end
+
+    def delete_products
+      @object.products.destroy_all
     end
 
 end
