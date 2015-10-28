@@ -11,7 +11,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def new
-    @supplier = Spree::Supplier.new
+    @supplier = Spree::Supplier.new(address_attributes: {})
     @title = "New Shop"
     @body_id = 'shop-manage'
     @selected = 'new'
@@ -40,6 +40,8 @@ class Spree::SuppliersController < Spree::StoreController
 
   def update
     if @supplier.update_attributes supplier_params
+      address = Spree::Address.find(params[:supplier][:address_attributes][:id])
+      address.update address_params
       flash[:success] = "Your shop has been updated!"
       redirect_to @supplier
     else
@@ -86,6 +88,11 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def supplier_params
-    params.require(:supplier).permit(:name, :slug, :description, :banner, :email)
+    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :address_attributes, :return_policy)
+  end
+
+  def address_params
+    supplier = params[:supplier]
+    supplier.require(:address_attributes).permit(Spree::PermittedAttributes.address_attributes)
   end
 end
