@@ -21,6 +21,9 @@ class Spree::SuppliersController < Spree::StoreController
   def create
     params[:supplier][:email] = spree_current_user.email
     @supplier = Spree::Supplier.new supplier_params
+    address = Spree::Address.new address_params
+    address.save
+    @supplier.address = address
     if @supplier.save
       flash[:success] = "Your shop has been created! Verify your account."
       redirect_to verify_supplier_path(@supplier)
@@ -47,9 +50,8 @@ class Spree::SuppliersController < Spree::StoreController
         address.update address_params
       else
         address = Spree::Address.new address_params
-        # address.save
-        abort address.save.to_yaml
-        @supplier.address_id = address.id
+        address.save
+        @supplier.address = address
         @supplier.save
       end
       flash[:success] = "Your shop has been updated!"
