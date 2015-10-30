@@ -8,7 +8,7 @@ Spree::Core::Engine.add_routes do
 
   namespace :api, defaults: { format: 'json' } do
     resource :sessions, controller: :user_sessions
-    resources :suppliers, only: [:index, :show]
+    resources :suppliers, only: [:index, :show, :update]
   end
 
 end
