@@ -5,6 +5,7 @@ class Spree::SuppliersController < Spree::StoreController
   before_filter :is_supplier, only: [:edit, :update, :verify, :destroy]
 
   def index
+    # @suppliers = Spree::Supplier.where(:active => true)
     @suppliers = Spree::Supplier.all
     @title = "Pet Shops"
     @body_id = 'shops'
@@ -36,12 +37,21 @@ class Spree::SuppliersController < Spree::StoreController
 
   def edit
     @body_id = 'shop-manage'
+    @supplier.address = Spree::Address.default unless @supplier.address.present?
   end
 
   def update
-    if @supplier.update_attributes supplier_params
-      address = Spree::Address.find(params[:supplier][:address_attributes][:id])
-      address.update address_params
+    if @supplier.update_attributes(supplier_params)
+      if params[:supplier][:address_attributes][:id].present?
+        address = Spree::Address.find(params[:supplier][:address_attributes][:id])
+        address.update address_params
+      else
+        address = Spree::Address.new address_params
+        # address.save
+        abort address.save.to_yaml
+        @supplier.address_id = address.id
+        @supplier.save
+      end
       flash[:success] = "Your shop has been updated!"
       redirect_to @supplier
     else
@@ -78,6 +88,10 @@ class Spree::SuppliersController < Spree::StoreController
 
   def supplier
     @supplier = Spree::Supplier.friendly.find(params[:id])
+    # if @supplier.active == false && (!try_spree_current_user || !spree_current_user.has_spree_role?("admin") || (spree_current_user.supplier_id != @supplier.id))
+    #   flash[:warning] = "Pet Shop Not Available!"
+    #   redirect_to suppliers_path
+    # end
   end
 
   def is_supplier
