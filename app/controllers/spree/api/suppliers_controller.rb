@@ -3,7 +3,11 @@ module Spree
     class SuppliersController < Spree::Api::BaseController
 
       def index
-          @suppliers = Spree::Supplier.accessible_by(current_ability, :read).ransack(params[:q]).result.page(params[:page]).per(params[:per_page])
+          supplier_scope = Spree::Supplier.accessible_by(current_ability, :read);
+          if params[:q][:featured_eq]
+            supplier_scope = supplier_scope.order('random()')
+          end
+          @suppliers = supplier_scope.ransack(params[:q]).result.page(params[:page]).per(params[:per_page])
           respond_with(@suppliers)
       end
 
