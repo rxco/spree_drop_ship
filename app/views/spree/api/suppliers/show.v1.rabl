@@ -9,3 +9,5 @@ node(:products) { |s|
       extends "spree/api/products/show"
     end
 }
+node(:fans) { |s| s.favorites.count }
+node(:verified) { |s| s.verified? }
