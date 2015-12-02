@@ -32,19 +32,20 @@ Spree::Product.class_eval do
 
   # TODO Look for other way to add variants to product
   # Builds variants from a hash of option types & values
-  def build_variants_from_option_values_hash(option_values_hash, sku)
+  def build_variants_from_option_values_hash(option_values_hash, sku, location_id)
     ensure_option_types_exist_for_values_hash
     values = option_values_hash.values
-
     # values = values.inject(values.shift) { |memo, value| memo.product(value).map(&:flatten) }
     values.each_with_index  do |value, index|
       variant = variants.create(
           option_value_ids: value[:ids],
           price: value[:price],
           position: index + 1,
-          stock_items_count: value[:quantity],
-          sku: sku + '-' + index.to_s
+          stock_items_count: value[:quantity].to_i,
+          sku: "#{sku}-#{index.to_s}"
       )
+      stock = Spree::StockItem.where(:stock_location_id => location_id, :variant_id => variant.id).first_or_create
+      stock.set_count_on_hand(value[:quantity].to_i)
     end
     save
   end
