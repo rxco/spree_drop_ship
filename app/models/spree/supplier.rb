@@ -3,6 +3,9 @@ class Spree::Supplier < Spree::Base
 
   extend FriendlyId
   friendly_id :name, use: :slugged
+
+  acts_as_paranoid
+
   attr_accessor :password, :password_confirmation
 
   has_attached_file :banner, :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
