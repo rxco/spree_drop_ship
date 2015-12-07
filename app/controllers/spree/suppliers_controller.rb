@@ -34,7 +34,6 @@ class Spree::SuppliersController < Spree::StoreController
 
   def show
     @products = @supplier.products
-    @title = "Shop #{@supplier.name}"
     @body_id = 'shop-details'
   end
 
