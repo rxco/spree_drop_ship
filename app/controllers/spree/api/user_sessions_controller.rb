@@ -3,7 +3,8 @@ module Spree
     class UserSessionsController < Spree::Api::BaseController
 
       def create
-        @user = Spree::User.find_by_email(params[:user][:email])
+        email = params[:user][:email].downcase
+        @user = Spree::User.find_by_email(email)
         if @user.nil?
           not_found
           return
