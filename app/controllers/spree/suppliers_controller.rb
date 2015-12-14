@@ -73,7 +73,8 @@ class Spree::SuppliersController < Spree::StoreController
 
   def check_authorization
     if try_spree_current_user.nil?
-      redirect_unauthorized_access
+      flash[:error] = "You must be logged in to access this content!"
+      redirect_to '/user' and return
     end
 
     action = params[:action].to_sym
@@ -98,7 +99,7 @@ class Spree::SuppliersController < Spree::StoreController
   def is_supplier
     unless try_spree_current_user && (spree_current_user.supplier_id === @supplier.id)
       flash[:error] = "You don't hav permission to access this content!"
-      redirect_to @supplier
+      redirect_to @supplier and return
     end
   end
 
