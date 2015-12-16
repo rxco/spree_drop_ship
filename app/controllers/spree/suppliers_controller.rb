@@ -5,8 +5,11 @@ class Spree::SuppliersController < Spree::StoreController
   before_filter :is_supplier, only: [:edit, :update, :verify, :destroy]
 
   def index
-    # @suppliers = Spree::Supplier.where(:active => true)
-    @suppliers = Spree::Supplier.all
+    if try_spree_current_user && spree_current_user.has_spree_role?("admin")
+      @suppliers = Spree::Supplier.all
+    else
+      @suppliers = Spree::Supplier.where(:active => true)
+    end
     @title = "Pet Shops"
     @body_id = 'shops'
   end
@@ -73,7 +76,6 @@ class Spree::SuppliersController < Spree::StoreController
 
   def check_authorization
     if try_spree_current_user.nil?
-      flash[:error] = "You must be logged in to access this content!"
       redirect_to '/user' and return
     end
 
@@ -90,10 +92,10 @@ class Spree::SuppliersController < Spree::StoreController
 
   def supplier
     @supplier = Spree::Supplier.friendly.find(params[:id])
-    # if @supplier.active == false && (!try_spree_current_user || !spree_current_user.has_spree_role?("admin") || (spree_current_user.supplier_id != @supplier.id))
-    #   flash[:warning] = "Pet Shop Not Available!"
-    #   redirect_to suppliers_path
-    # end
+    unless @supplier.active || (try_spree_current_user && (spree_current_user.supplier_id === @supplier.id || spree_current_user.has_spree_role?("admin")))
+      flash[:warning] = "Pet shop not available!"
+      redirect_to suppliers_path
+    end
   end
 
   def is_supplier
