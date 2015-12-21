@@ -92,7 +92,7 @@ class Spree::SuppliersController < Spree::StoreController
 
   def supplier
     @supplier = Spree::Supplier.friendly.find(params[:id])
-    unless @supplier.active || (try_spree_current_user && (spree_current_user.supplier_id === @supplier.id || spree_current_user.has_spree_role?("admin")))
+    unless @supplier.public? || (try_spree_current_user && (spree_current_user.supplier_id === @supplier.id || spree_current_user.has_spree_role?("admin")))
       flash[:warning] = "Pet shop not available!"
       redirect_to suppliers_path
     end
