@@ -37,7 +37,7 @@ class Spree::SuppliersController < Spree::StoreController
 
   def show
     @products = @supplier.products
-    unless try_spree_current_user && (spree_current_user.supplier_id === @supplier.id)
+    unless (try_spree_current_user && spree_current_user.supplier_id == @supplier.id ) || (try_spree_current_user && spree_current_user.has_spree_role?("admin"))
       @products = @products.available
     end
     @body_id = 'shop-details'
