@@ -5,10 +5,13 @@ class Spree::SuppliersController < Spree::StoreController
   before_filter :is_supplier, only: [:edit, :update, :verify, :destroy]
 
   def index
+    suppliers = Spree::Supplier.joins("LEFT JOIN spree_favorites ON spree_favorites.favorable_type = 'Spree::Supplier' AND spree_favorites.favorable_id = spree_suppliers.id")
+                .group('spree_suppliers.id')
+                .order('COUNT(spree_favorites.favorable_id) DESC')
     if try_spree_current_user && spree_current_user.has_spree_role?("admin")
-      @suppliers = Spree::Supplier.all
+      @suppliers = suppliers.page(params[:page]).per(15)
     else
-      @suppliers = Spree::Supplier.where(:active => true)
+      @suppliers = suppliers.where(:active => true).page(params[:page]).per(15)
     end
     @title = "Pet Shops"
     @body_id = 'shops'
