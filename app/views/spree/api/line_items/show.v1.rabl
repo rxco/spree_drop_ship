@@ -5,6 +5,7 @@ child :product do
   child :product_properties => :properties do
     attributes *product_property_attributes
   end
+  child(:images => :images) { extends "spree/api/images/show" }
 end
 node(:note) { |li| li.note}
 node(:single_display_amount) { |li| li.single_display_amount.to_s }
