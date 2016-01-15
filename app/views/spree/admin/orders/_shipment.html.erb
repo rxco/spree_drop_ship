@@ -152,4 +152,31 @@
     });
   });
 
+  // handle tracking save
+  $('[data-hook=admin_shipment_form_fields] a.save-tracking').on('click', function (event) {
+    event.preventDefault();
+
+    var link = $(this);
+    var shipment_number = link.data('shipment-number');
+    var tracking = link.parents('tbody').find('input#tracking').val();
+    var url = Spree.url(Spree.routes.shipments_api + '/' + shipment_number + '.json');
+
+    $.ajax({
+      type: 'PUT',
+      url: url,
+      data: {
+        shipment: {
+          tracking: tracking
+        },
+        token: Spree.api_key
+      }
+    }).done(function (data) {
+      link.parents('tbody').find('tr.edit-tracking').toggle();
+
+      var show = link.parents('tbody').find('tr.show-tracking');
+      show.toggle();
+      show.find('.tracking-value').html($("<strong>").html("<%= Spree.t(:tracking) %>: ")).append(data.tracking);
+    });
+  });
+
 </script>
