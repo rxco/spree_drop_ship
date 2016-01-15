@@ -113,3 +113,43 @@
                                             <%= link_to Spree.t(:ship), 'javascript:;', class: 'ship pull-left btn btn-success', data: { 'shipment-number' => shipment.number } %>
                                               <div class='clearfix'></div>
                                             <% end %>
+
+<script>
+
+  // handle ship click
+  $('[data-hook=admin_shipment_form_fields] a.ship').on('click', function () {
+    var link = $(this);
+    var shipment_number = link.data('shipment-number');
+    var url = Spree.url(Spree.routes.shipments_api + '/' + shipment_number + '/ship.json');
+    $.ajax({
+      type: 'PUT',
+      url: url,
+      data: {
+        token: Spree.api_key
+      }
+    }).done(function () {
+      window.location.reload();
+    }).error(function (msg) {
+      console.log(msg);
+    });
+  });
+
+  // handle ship click
+  $('[data-hook=admin_shipment_form_fields] a.ready').on('click', function () {
+    var link = $(this);
+    var shipment_number = link.data('shipment-number');
+    var url = Spree.url(Spree.routes.shipments_api + '/' + shipment_number + '/ready.json');
+    $.ajax({
+      type: 'PUT',
+      url: url,
+      data: {
+        token: Spree.api_key
+      }
+    }).done(function () {
+      window.location.reload();
+    }).error(function (msg) {
+      console.log(msg);
+    });
+  });
+
+</script>
