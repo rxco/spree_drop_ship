@@ -21,11 +21,14 @@ Spree::Shipment.class_eval do
   end
 
   def supplier_commission_total
-    self.final_price_with_items * self.supplier.commission_percentage
+    if self.supplier.present? && self.supplier.commission_percentage.present?
+      self.final_price_with_items * self.supplier.commission_percentage
+    else
+      self.final_price_with_items * SpreeDropShip::Config[:default_commission_percentage].to_f
+    end
   end
 
   def update_commission
-    logger.debug "COMMISSION: #{self.supplier_commission_total}"
     update_column :supplier_commission, self.supplier_commission_total
   end
 
