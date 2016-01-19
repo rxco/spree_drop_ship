@@ -19,6 +19,7 @@ Spree::Order.class_eval do
           Rails.logger.error ex.backtrace.join("\n")
           return true # always return true so that failed email doesn't crash app.
         end
+        shipment.update_commission
       end
     end
   end

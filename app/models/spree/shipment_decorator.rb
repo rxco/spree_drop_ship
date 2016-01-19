@@ -12,27 +12,32 @@ Spree::Shipment.class_eval do
     Spree::Money.new final_price_with_items
   end
 
+  def item_cost
+    self.manifest.map { |m| m.line_item.price * m.quantity }.sum
+  end
+
   def final_price_with_items
     self.item_cost + self.final_price
   end
 
-  # TODO move commission to spree_marketplace?
   def supplier_commission_total
-    ((self.final_price_with_items * self.supplier.commission_percentage / 100) + self.supplier.commission_flat_rate)
-  end
-
-  private
-
-  durably_decorate :after_ship, mode: 'soft', sha: 'e8eca7f8a50ad871f5753faae938d4d01c01593d' do
-    original_after_ship
-
-    if supplier.present?
-      update_commission
-    end
+    self.final_price_with_items * self.supplier.commission_percentage
   end
 
   def update_commission
+    logger.debug "COMMISSION: #{self.supplier_commission_total}"
     update_column :supplier_commission, self.supplier_commission_total
   end
+
+  # private
+  #
+  # durably_decorate :after_ship, mode: 'soft', sha: 'e8eca7f8a50ad871f5753faae938d4d01c01593d' do
+  #   original_after_ship
+  #
+  #   if supplier.present?
+  #     update_commission
+  #   end
+  # end
+
 
 end
