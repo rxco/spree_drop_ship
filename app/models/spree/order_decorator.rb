@@ -8,6 +8,8 @@ Spree::Order.class_eval do
   # If you want to customize this you could override it as a hook for notifying a supplier with a API request instead.
   def finalize_with_drop_ship!
     finalize_without_drop_ship!
+    self.payment_state = 'paid'
+    self.save!
     shipments.each do |shipment|
       if SpreeDropShip::Config[:send_supplier_email] && shipment.supplier.present?
         begin
@@ -20,6 +22,8 @@ Spree::Order.class_eval do
           return true # always return true so that failed email doesn't crash app.
         end
         shipment.update_commission
+        shipment.ready!
+        shipment.save!
       end
     end
   end
