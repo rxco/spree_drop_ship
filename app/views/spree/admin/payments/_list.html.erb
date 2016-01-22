@@ -18,7 +18,7 @@
         <td class="amount text-center"><%= payment.display_amount %></td>
         <td class="text-center"><%= payment_method_name(payment) %></td>
         <td class="text-center">
-            <%= link_to payment.transaction_id, "https://dashboard.stripe.com/test/payments/#{payment.transaction_id}", :target => '_blank' if payment.transaction_id.present? %>
+            <%= link_to payment.transaction_id, "https://dashboard.stripe.com/payments/#{payment.transaction_id}", :target => '_blank' if payment.transaction_id.present? %>
             <%= raw "<br><small>Paid to <strong>#{link_to payment.supplier.name, edit_admin_supplier_path(payment.supplier)}</strong></small>" if payment.supplier.present? %>
         </td>
         <td class="text-center">
