@@ -10,7 +10,7 @@
         <strong><%= Spree.t(:sku) %>:</strong> <%= item.variant.sku %>
       <% end %>
       <% if item.first.note.present? %>
-        <p>NOTE: <%= item.note %></p>
+        <p>NOTE: <%= item.first.note %></p>
       <% end %>
     </td>
 
