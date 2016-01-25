@@ -5,12 +5,12 @@
     </td>
 
     <td class="item-name">
-      <%= item.variant.product.name %><br><%= raw "(" + variant_options(item.variant) + ")<br>" unless item.variant.option_values.empty? %>
+      <%= link_to item.variant.product.name, edit_admin_product_path(item.variant.product) %><br><%= raw "(" + variant_options(item.variant) + ")<br>" unless item.variant.option_values.empty? %>
       <% if item.variant.sku.present? %>
         <strong><%= Spree.t(:sku) %>:</strong> <%= item.variant.sku %>
       <% end %>
       <% if item.first.note.present? %>
-        <p>NOTE: item.note</p>
+        <p>NOTE: <%= item.note %></p>
       <% end %>
     </td>
 
