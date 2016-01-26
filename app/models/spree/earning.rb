@@ -1,8 +1,7 @@
 class Spree::Earning
 
   def initialize(supplier)
-    @supplier = supplier
-    stock_location = @supplier.stock_locations
+    stock_location = supplier.stock_locations
     @shipments = Spree::Shipment.where("spree_shipments.stock_location_id = ? AND spree_shipments.state != ? AND spree_shipments.state != ?", stock_location.first.id, "pending", "canceled")
   end
 
@@ -19,7 +18,7 @@ class Spree::Earning
   private
 
   def today
-    shipments = @shipments.where(:created_at => Date.today)
+    shipments = @shipments.where("created_at >= ? AND created_at <= ?", Date.today.to_time.beginning_of_day, Date.today.to_time.end_of_day)
     earnings = 0
     shipments.each do |s|
       earnings += s.supplier_commission.to_f
@@ -28,7 +27,7 @@ class Spree::Earning
   end
 
   def yesterday
-    shipments = @shipments.where(:created_at => Date.yesterday)
+    shipments = @shipments.where("created_at >= ? AND created_at <= ?", Date.yesterday.to_time.beginning_of_day, Date.yesterday.to_time.end_of_day)
     earnings = 0
     shipments.each do |s|
       earnings += s.supplier_commission.to_f
@@ -37,7 +36,7 @@ class Spree::Earning
   end
 
   def rolling
-    shipments = @shipments.where("created_at < ? AND created_at > ?", Date.today, 32.day.ago)
+    shipments = @shipments.where("created_at < ? AND created_at > ?",Date.yesterday.to_time.end_of_day, 31.day.ago.to_time.beginning_of_day)
     earnings = 0
     shipments.each do |s|
       earnings += s.supplier_commission.to_f
@@ -52,4 +51,5 @@ class Spree::Earning
     end
     Spree::Money.new earnings
   end
+
 end
