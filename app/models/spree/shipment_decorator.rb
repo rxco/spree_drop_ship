@@ -32,8 +32,20 @@ Spree::Shipment.class_eval do
     update_column :supplier_commission, self.supplier_commission_total
   end
 
-  # private
-  #
+  def confirmation_delivered=(value)
+    @confirmation_delivered = value
+  end
+
+  def confirmation_delivered
+    @confirmation_delivered
+  end
+
+  private
+
+  def after_ship
+    Spree::ShipmentHandler.factory(self).perform self.confirmation_delivered
+  end
+
   # durably_decorate :after_ship, mode: 'soft', sha: 'e8eca7f8a50ad871f5753faae938d4d01c01593d' do
   #   original_after_ship
   #

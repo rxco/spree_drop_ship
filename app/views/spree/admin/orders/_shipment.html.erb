@@ -107,7 +107,7 @@
                                                                           <td colspan="6">
                                                                                 <div class='clearfix'></div>
                                                                                 <%= link_to Spree.t(:ship), 'javascript:;', class: 'ship btn btn-success', data: { 'shipment-number' => shipment.number } %>
-                                                                                  <div class='clearfix'></div>
+                                                                                <%= link_to Spree.t(:ship_no_email), 'javascript:;', class: 'ship-no-email btn btn-warning', data: { 'shipment-number' => shipment.number, 'email' => false } %>
                                                                           </td>
                                                                       </tr>
                                                                       <% end %>

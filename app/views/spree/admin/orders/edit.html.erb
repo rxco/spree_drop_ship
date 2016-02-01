@@ -39,4 +39,24 @@
   <%= javascript_tag 'var expand_variants = true;' %>
 <% end %>
 
+<script>
+  $('[data-hook=admin_shipment_form] a.ship-no-email').on('click', function () {
+    var link = $(this);
+    var shipment_number = link.data('shipment-number');
+    var url = Spree.url(Spree.routes.shipments_api + '/' + shipment_number + '/ship.json');
+    $.ajax({
+      type: 'PUT',
+      url: url,
+      data: {
+        token: Spree.api_key,
+        message: 0
+      }
+    }).done(function () {
+      window.location.reload();
+    }).error(function (msg) {
+      console.log(msg);
+    });
+  });
+</script>
+
 <%= render partial: 'spree/admin/shared/order_summary' %>
