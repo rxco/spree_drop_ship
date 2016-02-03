@@ -52,12 +52,6 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def update
-
-    # set attr_accessor :crop, before the update
-    if params[:crop].present?
-      @supplier.crop = params[:crop]
-    end
-
     if @supplier.update_attributes(supplier_params)
       if params[:supplier][:address_attributes][:id].present?
         address = Spree::Address.find(params[:supplier][:address_attributes][:id])
@@ -118,7 +112,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def supplier_params
-    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :address_attributes, :return_policy)
+    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :address_attributes, :return_policy, :crop)
   end
 
   def address_params

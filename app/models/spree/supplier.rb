@@ -6,7 +6,7 @@ class Spree::Supplier < Spree::Base
 
   acts_as_paranoid
 
-  attr_accessor :password, :password_confirmation, :crop
+  attr_accessor :password, :password_confirmation
 
   has_attached_file :banner, :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
                     :default_style => :large,
@@ -72,12 +72,6 @@ class Spree::Supplier < Spree::Base
   scope :active, -> { where(active: true) }
 
   def cropping?
-
-    # Notes:
-    # issue is that self.crop is being recognized but self['crop'] is not.
-    # if you update everything to self.crop, it works.
-
-    puts "CROP: #{self.crop}"
     !self['crop'].blank?
   end
 
