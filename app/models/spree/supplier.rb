@@ -6,11 +6,12 @@ class Spree::Supplier < Spree::Base
 
   acts_as_paranoid
 
-  attr_accessor :password, :password_confirmation
+  attr_accessor :password, :password_confirmation, :crop
 
   has_attached_file :banner, :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
                     :default_style => :large,
                     :default_url => "noimage/:attachment-:style.png",
+                    :processors => [:cropper],
                     :convert_options => {
                         :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
                     },
@@ -61,12 +62,29 @@ class Spree::Supplier < Spree::Base
   after_create :assign_user
   after_create :create_stock_location
   after_create :send_welcome, if: -> { SpreeDropShip::Config[:send_supplier_email] }
+  after_create :reprocess_attachment, :if => :cropping?
+  after_update :reprocess_attachment, :if => :cropping?
   before_create :set_commission
   before_validation :check_url
 
   #==========================================
   # Instance Methods
   scope :active, -> { where(active: true) }
+
+  def cropping?
+
+    # Notes:
+    # issue is that self.crop is being recognized but self['crop'] is not.
+    # if you update everything to self.crop, it works.
+
+    puts "CROP: #{self.crop}"
+    !self['crop'].blank?
+  end
+
+  def reprocess_attachment
+    self.banner.assign(banner)
+    self.banner.save
+  end
 
   def deleted?
     deleted_at.present?

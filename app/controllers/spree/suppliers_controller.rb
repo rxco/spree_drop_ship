@@ -52,6 +52,12 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def update
+
+    # set attr_accessor :crop, before the update
+    if params[:crop].present?
+      @supplier.crop = params[:crop]
+    end
+
     if @supplier.update_attributes(supplier_params)
       if params[:supplier][:address_attributes][:id].present?
         address = Spree::Address.find(params[:supplier][:address_attributes][:id])
