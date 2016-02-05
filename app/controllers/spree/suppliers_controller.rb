@@ -52,6 +52,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def update
+    @supplier.remove_banner = params[:remove_banner]
     if @supplier.update_attributes(supplier_params)
       if params[:supplier][:address_attributes][:id].present?
         address = Spree::Address.find(params[:supplier][:address_attributes][:id])

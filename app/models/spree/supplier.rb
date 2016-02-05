@@ -6,7 +6,7 @@ class Spree::Supplier < Spree::Base
 
   acts_as_paranoid
 
-  attr_accessor :password, :password_confirmation
+  attr_accessor :password, :password_confirmation, :remove_banner
 
   has_attached_file :banner, :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
                     :default_style => :large,
@@ -66,6 +66,7 @@ class Spree::Supplier < Spree::Base
   after_update :reprocess_attachment, :if => :cropping?
   before_create :set_commission
   before_validation :check_url
+  before_save :delete_banner, if: -> {self.remove_banner == 'true'}
 
   #==========================================
   # Instance Methods
@@ -149,6 +150,11 @@ class Spree::Supplier < Spree::Base
       unless changes.has_key?(:commission_percentage)
         self.commission_percentage = SpreeDropShip::Config[:default_commission_percentage]
       end
+    end
+
+    def delete_banner
+      self.banner = nil
+      self.crop = nil
     end
 
 end
