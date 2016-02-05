@@ -62,8 +62,8 @@ class Spree::Supplier < Spree::Base
   after_create :assign_user
   after_create :create_stock_location
   after_create :send_welcome, if: -> { SpreeDropShip::Config[:send_supplier_email] }
-  after_create :reprocess_attachment, :if => :cropping?
-  after_update :reprocess_attachment, :if => :cropping?
+  after_create :save_banner, :if => :cropping?
+  after_update :save_banner, :if => :cropping?
   before_create :set_commission
   before_validation :check_url
   before_save :delete_banner, if: -> {self.remove_banner == 'true'}
@@ -76,9 +76,13 @@ class Spree::Supplier < Spree::Base
     !self['crop'].blank?
   end
 
-  def reprocess_attachment
-    self.banner.assign(banner)
-    self.banner.save
+  def save_banner
+    banner.assign(banner)
+    banner.save
+  end
+
+  def reprocess_banner
+    banner.reprocess!
   end
 
   def deleted?
