@@ -52,7 +52,9 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def update
-    @supplier.remove_banner = params[:remove_banner]
+    if params[:remove_banner].present?
+      @supplier.remove_banner = params[:remove_banner]
+    end
     if @supplier.update_attributes(supplier_params)
       if(!params[:supplier][:banner].present? and params[:supplier][:crop].present?)
         @supplier.reprocess_banner
