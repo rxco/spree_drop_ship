@@ -52,7 +52,13 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def update
+    if params[:remove_banner].present?
+      @supplier.remove_banner = params[:remove_banner]
+    end
     if @supplier.update_attributes(supplier_params)
+      if(!params[:supplier][:banner].present? and params[:supplier][:crop].present?)
+        @supplier.reprocess_banner
+      end
       if params[:supplier][:address_attributes][:id].present?
         address = Spree::Address.find(params[:supplier][:address_attributes][:id])
         address.update address_params
@@ -112,7 +118,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def supplier_params
-    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :address_attributes, :return_policy)
+    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :address_attributes, :return_policy, :crop)
   end
 
   def address_params

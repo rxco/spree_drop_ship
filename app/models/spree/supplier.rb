@@ -6,11 +6,12 @@ class Spree::Supplier < Spree::Base
 
   acts_as_paranoid
 
-  attr_accessor :password, :password_confirmation
+  attr_accessor :password, :password_confirmation, :remove_banner
 
   has_attached_file :banner, :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
                     :default_style => :large,
                     :default_url => "noimage/:attachment-:style.png",
+                    :processors => [:cropper],
                     :convert_options => {
                         :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
                     },
@@ -61,12 +62,28 @@ class Spree::Supplier < Spree::Base
   after_create :assign_user
   after_create :create_stock_location
   after_create :send_welcome, if: -> { SpreeDropShip::Config[:send_supplier_email] }
+  after_create :save_banner, :if => :cropping?
+  after_update :save_banner, :if => :cropping?
   before_create :set_commission
   before_validation :check_url
+  before_save :delete_banner, if: -> {self.remove_banner == 'true'}
 
   #==========================================
   # Instance Methods
   scope :active, -> { where(active: true) }
+
+  def cropping?
+    !self['crop'].blank?
+  end
+
+  def save_banner
+    banner.assign(banner)
+    banner.save
+  end
+
+  def reprocess_banner
+    banner.reprocess!
+  end
 
   def deleted?
     deleted_at.present?
@@ -137,6 +154,11 @@ class Spree::Supplier < Spree::Base
       unless changes.has_key?(:commission_percentage)
         self.commission_percentage = SpreeDropShip::Config[:default_commission_percentage]
       end
+    end
+
+    def delete_banner
+      self.banner = nil
+      self.crop = nil
     end
 
 end
